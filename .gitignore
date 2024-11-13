@@ -1,0 +1,21 @@
+# Python-specific ignore patterns
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite
+
+# Archivos de configuración del entorno virtual
+/env
+.env
+.env/
+
+# Archivos de configuración de IDEs
+.vscode/
+
+#Igoner DB
+citas_medicas.sqlite3
+citas_medicas.sqlite3-journal
+
+.pytest_cache
