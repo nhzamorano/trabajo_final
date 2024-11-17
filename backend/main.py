@@ -18,6 +18,11 @@ class PacienteBase(BaseModel):
     celular: str 
     correo: str
 
+class CitaBase(BaseModel):
+    fecha_hora: str
+    paciente: int
+    medico: int
+
 class UsuarioBase(BaseModel):
     nombre: str
     telefono: str 
@@ -146,6 +151,55 @@ def eliminar_paciente_view(paciente_id: int):
         raise HTTPException(status_code=404, detail="Paciente no encontrado")
     return {"mensaje": "Paciente eliminado", "paciente": paciente_eliminado.nombre_completo}
 
+#******** CITAS ************
+@app.post("/cita")
+def agregar_cita_view(cita: CitaBase):
+    nueva_cita = agregar_cita(cita.fecha_hora,cita.paciente, cita.medico)
+    if nueva_cita is None:
+        raise HTTPException(status_code=400, detail="Error al crear la cita")
+    return {"mensaje": "Cita agregado", "cita": nueva_cita.paciente}
+
+@app.put("/cita/{cita_id}")
+def actualizar_cita_view(cita_id: int, cita: CitaBase):
+    cita_actualizada = actualizar_cita(
+        cita_id,
+        cita.fecha_hora,
+        cita.paciente,
+        cita.medico
+    )
+    if cita_actualizada is None:
+        raise HTTPException(status_code=404, detail="Cita no encontrado o no se pudo actualizar")
+    return {"mensaje": "Cita actualizado", "cita": cita_actualizada.paciente}
+
+@app.get("/citas")
+def obtener_citas_view():
+    citas = obtener_citas()
+    citas_lista = [{
+        "fecha_hora": cita.fecha_hora,
+        "paciente": paciente_nombre,
+        "medico": medico_nombre
+    }
+    for cita,paciente_nombre,medico_nombre in citas
+    ]
+    if citas_lista:
+        return {"citas": citas_lista}
+    else:
+        return {"mensaje": "No hay citas disponibles para ese pasciente en la bd"} 
+
+@app.get("/cita/{identificacion}")
+def obtener_cita_view(identificacion: int):
+    cita = obtener_cita_por_id(identificacion)
+    if not cita:
+        #raise HTTPException(status_code=404, detail="Medico no encontrado")
+        return {"mensaje": "Cita no encontrada"}
+    return {"cita": cita}
+
+@app.delete("/cita/{cita_id}")
+def eliminar_cita_view(cita_id: int):
+    cita_eliminada = eliminar_cita(cita_id)
+    if not cita_eliminada:
+        raise HTTPException(status_code=404, detail="Cita no encontrado")
+    return {"mensaje": "Cita eliminada"}
 
 #********Usuarios***********
 @app.post("/usuario")

@@ -32,9 +32,10 @@ class Paciente(Base):
 
 class Cita(Base):
     __tablename__ = 'citas'
-    identificacion = Column(Integer, primary_key=True)
-    nombre_completo = Column(String(50), nullable=False)
-    celular = Column(String(50),nullable=False)
+    id = Column(Integer, primary_key=True)
+    fecha_hora = Column(String(100), nullable=False)
+    paciente = Column(Integer,nullable=False)
+    medico = Column(Integer, nullable=False)
 
 class Usuario(Base):
     __tablename__ = 'usuarios'
@@ -49,15 +50,3 @@ class Usuario(Base):
 
 # Crear las tablas en la base de datos (si no existen)
 Base.metadata.create_all(engine)
-
-""""""
-# 1. Agregar un nuevo médico
-#def agregar_medico(nombre, especialidad):
-#    nuevo_medico = Medico(nombre_completo=nombre, especialidad=especialidad)
-#    session.add(nuevo_medico)
-#    session.commit()
-#    return nuevo_medico
-
-# 2. Obtener todos los médicos
-#def obtener_medicos():
-#    return session.query(Medico).all()

@@ -1,6 +1,7 @@
 from datetime import datetime
 from sqlalchemy.exc import IntegrityError
-from .models import Medico,Paciente,Usuario, session
+from sqlalchemy import select
+from .models import Medico,Paciente,Cita,Usuario, session
 
 #*************MEDICOS**************************
 def agregar_medico(identificacion : int,nombre_completo: str, telefono:str, especialidad: str):
@@ -115,6 +116,89 @@ def obtener_pacientes():
 
 def obtener_paciente_por_id(identificacion: int):
     return session.query(Paciente).filter(Paciente.identificacion == identificacion).first()
+
+#***************CITAS*************************
+def agregar_cita(fecha_hora : str,paciente: int, medico:int):
+    nueva_cita = Cita(fecha_hora=fecha_hora,paciente=paciente, medico=medico)
+    session.add(nueva_cita)
+    try:
+        session.commit()
+        return nueva_cita
+    except IntegrityError:
+        session.rollback()
+        print("Error de integridad: la cita ya existe")
+        return None
+
+def actualizar_cita(
+    id_cita,
+    fecha_hora: str, 
+    paciente: int, 
+    medico: int
+):
+    cita_existente = session.query(Cita).filter_by(id=id_cita).first()
+    if not cita_existente:
+        print(f"Cita con ID {id_cita} no encontrada")
+        return None
+
+    cita_existente.fecha_hora = fecha_hora
+    cita_existente.paciente = paciente
+    cita_existente.medico = medico
+
+    try:
+        session.commit()
+        return cita_existente
+    except IntegrityError:
+        session.rollback()
+        print("Error de integridad: conflicto al actualizar la cita")
+        return None
+
+def eliminar_cita(cita_id: int):
+    cita_existente = session.query(Cita).filter_by(id=cita_id).first()
+    if not cita_existente:
+        print(f"Cita con ID {cita_id} no encontrado")
+        return None
+    session.delete(cita_existente)
+    
+    try:
+        session.commit()
+        print(f"Cita con ID {cita_id} eliminado exitosamente")
+        return cita_existente
+    except Exception as e:
+        session.rollback()
+        print(f"Error al eliminar la cita: {str(e)}")
+        return None
+
+def obtener_citas():
+    citas = (
+        session.query(Cita, Paciente.nombre_completo.label("paciente_nombre"), Medico.nombre_completo.label("medico_nombre"))
+        .join(Paciente, Cita.paciente == Paciente.identificacion)
+        .join(Medico, Cita.medico == Medico.identificacion)
+        .all()
+    )
+    return citas
+
+def obtener_cita_por_id(identificacion: int):
+    cita = (
+        session.query(
+            Cita.fecha_hora,
+            Paciente.nombre_completo.label("paciente_nombre"),
+            Medico.nombre_completo.label("medico_nombre")
+        )
+        .join(Paciente, Cita.paciente == Paciente.identificacion)
+        .join(Medico, Cita.medico == Medico.identificacion)
+        .filter(Paciente.identificacion == identificacion)
+        .first()  
+    )
+
+    if cita:
+        fecha_hora,paciente_nombre,medico_nombre = cita
+        return {
+            "fecha_hora": fecha_hora,
+            "paciente": paciente_nombre,
+            "medico": medico_nombre
+        }
+    else:
+        return {"mensaje": "No se encontró la cita para este paciente."}
 
 #----------------------------------------------------------------
 def agregar_usuario(nombre: str, telefono: str,cargo:str,usuario:str,contrasena:str,email:str,fecha_registro: datetime):
