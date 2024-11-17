@@ -12,6 +12,12 @@ class MedicoBase(BaseModel):
     telefono: str 
     especialidad: str
 
+class PacienteBase(BaseModel):
+    identificacion: int
+    nombre_completo: str
+    celular: str 
+    correo: str
+
 class UsuarioBase(BaseModel):
     nombre: str
     telefono: str 
@@ -25,6 +31,7 @@ class UsuarioBase(BaseModel):
 async def favicon():
     return {"detail": "Favicon no configurado"}
 
+#***********MEDICOS*******************
 @app.post("/medico")
 def agregar_medico_view(medico: MedicoBase):
     nuevo_medico = agregar_medico(medico.identificacion,medico.nombre_completo, medico.telefono, medico.especialidad)
@@ -40,11 +47,8 @@ def actualizar_medico_view(medico_id: int, medico: MedicoBase):
         medico.telefono,
         medico.especialidad
     )
-    
-    # Verificar si el usuario se pudo actualizar
     if medico_actualizado is None:
         raise HTTPException(status_code=404, detail="Medico no encontrado o no se pudo actualizar")
-    
     return {"mensaje": "Medico actualizado", "medico": medico_actualizado.nombre_completo}
 
 @app.get("/medicos")
@@ -84,7 +88,66 @@ def eliminar_medico_view(medico_id: int):
         raise HTTPException(status_code=404, detail="Medico no encontrado")
     return {"mensaje": "Medico eliminado", "medico": medico_eliminado.nombre_completo}
 
-#-----------
+#********PACIENTES*************
+@app.post("/paciente")
+def agregar_paciente_view(paciente: PacienteBase):
+    nuevo_paciente = agregar_paciente(paciente.identificacion,paciente.nombre_completo, paciente.celular, paciente.correo)
+    if nuevo_paciente is None:
+        raise HTTPException(status_code=400, detail="Error al crear el paciente")
+    return {"mensaje": "Paciente agregado", "paciente": nuevo_paciente.nombre_completo}
+
+@app.put("/paciente/{paciente_id}")
+def actualizar_paciente_view(paciente_id: int, paciente: PacienteBase):
+    paciente_actualizado = actualizar_paciente(
+        paciente_id,
+        paciente.nombre_completo,
+        paciente.celular,
+        paciente.correo
+    )
+    if paciente_actualizado is None:
+        raise HTTPException(status_code=404, detail="Paciente no encontrado o no se pudo actualizar")
+    return {"mensaje": "Paciente actualizado", "paciente": paciente_actualizado.nombre_completo}
+
+
+@app.get("/pacientes")
+def obtener_pacientes_view():
+    pacientes = obtener_pacientes()
+    pacientes_lista = [{
+        "identificacion": paciente.identificacion,
+        "nombre_completo": paciente.nombre_completo,
+        "celular": paciente.celular,
+        "correo": paciente.correo
+    }
+    for paciente in pacientes
+    ]
+    if pacientes_lista:
+        return {"pacientes": pacientes_lista}
+    else:
+        return {"mensaje": "No hay pacientes disponibles en esta bd"} 
+
+@app.get("/paciente/{identificacion}")
+def obtener_paciente_view(identificacion: int):
+    paciente = obtener_paciente_por_id(identificacion)
+    if not paciente:
+        #raise HTTPException(status_code=404, detail="Medico no encontrado")
+        return {"mensaje": "Paciente no encontrado"}
+    paciente_lista = [{
+        "identidicacion": paciente.identificacion,
+        "nombre_completo": paciente.nombre_completo,
+        "celular": paciente.celular,
+        "correo": paciente.correo
+    }]
+    return {"paciente": paciente_lista}
+
+@app.delete("/paciente/{paciente_id}")
+def eliminar_paciente_view(paciente_id: int):
+    paciente_eliminado = eliminar_paciente(paciente_id=paciente_id)
+    if not paciente_eliminado:
+        raise HTTPException(status_code=404, detail="Paciente no encontrado")
+    return {"mensaje": "Paciente eliminado", "paciente": paciente_eliminado.nombre_completo}
+
+
+#********Usuarios***********
 @app.post("/usuario")
 def agregar_usuario_view(usuario: UsuarioBase):
     nuevo_usuario = agregar_usuario(usuario.nombre,usuario.telefono,usuario.cargo,usuario.usuario,usuario.contrasena,usuario.email,usuario.fecha_registro)

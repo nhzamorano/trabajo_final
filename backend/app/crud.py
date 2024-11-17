@@ -1,7 +1,8 @@
 from datetime import datetime
 from sqlalchemy.exc import IntegrityError
-from .models import Medico,Usuario, session
+from .models import Medico,Paciente,Usuario, session
 
+#*************MEDICOS**************************
 def agregar_medico(identificacion : int,nombre_completo: str, telefono:str, especialidad: str):
     nuevo_medico = Medico(identificacion=identificacion,nombre_completo=nombre_completo, telefono=telefono, especialidad=especialidad)
     session.add(nuevo_medico)
@@ -57,6 +58,63 @@ def eliminar_medico(medico_id: int):
         session.rollback()
         print(f"Error al eliminar el medico: {str(e)}")
         return None
+
+#***************PACIENTES*************************************
+def agregar_paciente(identificacion : int,nombre_completo: str, celular:str, correo: str):
+    nuevo_paciente = Paciente(identificacion=identificacion,nombre_completo=nombre_completo, celular=celular, correo=correo)
+    session.add(nuevo_paciente)
+    try:
+        session.commit()
+        return nuevo_paciente
+    except IntegrityError:
+        session.rollback()
+        print("Error de integridad: el paciente ya existe")
+        return None
+
+def actualizar_paciente(
+    paciente_id: int, 
+    nombre_completo: str, 
+    celular: str, 
+    correo: str
+):
+    paciente_existente = session.query(Paciente).filter_by(identificacion=paciente_id).first()
+    if not paciente_existente:
+        print(f"Paciente con ID {paciente_id} no encontrado")
+        return None
+
+    paciente_existente.nombre_completo = nombre_completo
+    paciente_existente.celular = celular
+    paciente_existente.correo = correo
+
+    try:
+        session.commit()
+        return paciente_existente
+    except IntegrityError:
+        session.rollback()
+        print("Error de integridad: conflicto al actualizar el paciente")
+        return None
+
+def eliminar_paciente(paciente_id: int):
+    paciente_existente = session.query(Paciente).filter_by(identificacion=paciente_id).first()
+    if not paciente_existente:
+        print(f"Paciente con ID {paciente_id} no encontrado")
+        return None
+    session.delete(paciente_existente)
+    
+    try:
+        session.commit()
+        print(f"Paciente con ID {paciente_id} eliminado exitosamente")
+        return paciente_existente
+    except Exception as e:
+        session.rollback()
+        print(f"Error al eliminar el paciente: {str(e)}")
+        return None
+
+def obtener_pacientes():
+    return session.query(Paciente).all()
+
+def obtener_paciente_por_id(identificacion: int):
+    return session.query(Paciente).filter(Paciente.identificacion == identificacion).first()
 
 #----------------------------------------------------------------
 def agregar_usuario(nombre: str, telefono: str,cargo:str,usuario:str,contrasena:str,email:str,fecha_registro: datetime):
