@@ -1,6 +1,5 @@
 from datetime import datetime
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import select
 from .models import Medico,Paciente,Cita,Usuario, session
 
 #*************MEDICOS**************************
@@ -20,7 +19,7 @@ def actualizar_medico(
     nombre_completo: str, 
     telefono: str, 
     especialidad: str
-):
+    ):
     medico_existente = session.query(Medico).filter_by(identificacion=medico_id).first()
     if not medico_existente:
         print(f"Medico con ID {medico_id} no encontrado")

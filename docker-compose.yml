@@ -12,5 +12,15 @@ services:
     ports: 
       - "3306:3306"
 
+  backend:
+    build: ./backend
+    environment:
+      - DATABASE_URL = os.getenv('DATABASE_URL', 'mysql+pymysql://admin:sistemas@database/citasmedicas?charset=utf8mb4')
+    ports:
+      - "8000:8000"
+    depends_on:
+      - database
+
+
 volumes:
   mysqldata:
