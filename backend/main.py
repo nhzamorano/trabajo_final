@@ -3,13 +3,8 @@ from app.crud import *
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from datetime import datetime
-from app import create_app
 
 app = FastAPI()
-app = create_app()
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080, debug=True)
 
 class MedicoBase(BaseModel):
     identificacion: int
