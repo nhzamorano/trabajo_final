@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Lista de Médicos</h1>
+<a href="{{ url_for('agregar_medico') }}">Agregar Médico</a>
+<ul>
+    {% for medico in medicos %}
+    <li>{{ medico.nombre_completo }} - {{ medico.especialidad }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

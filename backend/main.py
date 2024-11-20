@@ -3,6 +3,8 @@ from app.crud import *
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from datetime import datetime
+from fastapi.middleware.wsgi import WSGIMiddleware
+from frontend.routes import create_frontend_app  # Importar frontend
 
 app = FastAPI()
 
@@ -273,4 +275,14 @@ def eliminar_usuario_view(usuario_id: int):
     if not usuario_eliminado:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     return {"mensaje": "Usuario eliminado", "usuario": usuario_eliminado.nombre}
+
+# Crear la instancia de Flask para el frontend
+flask_app = create_frontend_app()
+
+# Integrar FastAPI con el frontend Flask usando WSGI
+app.mount("/", WSGIMiddleware(flask_app))
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
 
