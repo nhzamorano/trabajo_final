@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modificar Cita Medica</title>
+</head>
+<body>
+    <h1>Modificar Cita Medica</h1>
+    <form action="">
+        <input type="hidden" name="id" value="{{ cita['id'] }}">
+        <input type="text" name="fecha_hora" value="{{ cita['fecha_hora'] }}">
+        <input type="text" name="id_paciente" value="{{ cita['id_paciente'] }}">
+        <input type="text" name="paciente" value="{{ cita['paciente'] }}">
+        <input type="text" name="id_medico" value="{{ cita['id_medico'] }}">  
+        <input type="text" name="medico" value="{{ cita['medico'] }}">
+</form>
+</body>
+</html>

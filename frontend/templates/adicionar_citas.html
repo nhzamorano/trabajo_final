@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Cita Médica</title>
+</head>
+<body>
+    <h1>Agregar Cita Médica</h1>
+    <form action="/agregar_citas" method="POST">
+        <label for="fecha_hora">Fecha y Hora</label>
+        <input type="datetime-local" id="fecha_hora" name="fecha_hora" required>
+        <br><br>
+
+        <label for="id_paciente">ID Paciente</label>
+        <input type="number" id="id_paciente" name="id_paciente" placeholder="Id Paciente" required>
+        <br><br>
+
+        <label for="id_medico">ID Médico</label>
+        <input type="number" id="id_medico" name="id_medico" placeholder="Id Médico" required>
+        <br><br>
+
+        <button type="submit">Enviar</button>
+    </form>
+</body>
+</html>
