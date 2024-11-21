@@ -3,6 +3,7 @@ from app.crud import *
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from datetime import datetime
+from fastapi.responses import JSONResponse
 
 app = FastAPI()
 
@@ -182,7 +183,8 @@ def obtener_citas_view():
     for cita,paciente_nombre,medico_nombre in citas
     ]
     if citas_lista:
-        return {"citas": citas_lista}
+        citas = {"citas": citas_lista}
+        return JSONResponse(content=citas, headers={"Content-Type": "application/json; charset=utf-8"})
     else:
         return {"mensaje": "No hay citas disponibles para ese pasciente en la bd"} 
 
@@ -193,6 +195,27 @@ def obtener_cita_view(identificacion: int):
         #raise HTTPException(status_code=404, detail="Medico no encontrado")
         return {"mensaje": "Cita no encontrada"}
     return {"cita": cita}
+
+@app.get("/citas_hoy")
+def obtener_citas_hoy_view():
+    citas = obtener_citas_hoy()
+    citas_lista = [{
+        "fecha_hora": cita.fecha_hora,
+        "paciente": paciente_nombre,
+        "medico": medico_nombre
+    }
+    for cita, paciente_nombre, medico_nombre in citas
+    ]
+    
+    if citas_lista:
+        return JSONResponse(
+            content={"citas": citas_lista}, 
+            headers={"Content-Type": "application/json; charset=utf-8"}
+        )
+    else:
+        return {"mensaje": "No hay citas para hoy"}
+
+
 
 @app.delete("/cita/{cita_id}")
 def eliminar_cita_view(cita_id: int):
