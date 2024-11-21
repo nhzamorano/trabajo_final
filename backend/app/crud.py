@@ -1,5 +1,6 @@
-from datetime import datetime
+from datetime import datetime, date
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import func
 from .models import Medico,Paciente,Cita,Usuario, session
 
 #*************MEDICOS**************************
@@ -172,6 +173,22 @@ def obtener_citas():
         session.query(Cita, Paciente.nombre_completo.label("paciente_nombre"), Medico.nombre_completo.label("medico_nombre"))
         .join(Paciente, Cita.paciente == Paciente.identificacion)
         .join(Medico, Cita.medico == Medico.identificacion)
+        .all()
+    )
+    return citas
+
+def obtener_citas_hoy():
+    hoy = date.today()
+    citas = (
+        session.query(
+            Cita, 
+            Paciente.nombre_completo.label("paciente_nombre"), 
+            Medico.nombre_completo.label("medico_nombre")
+        )
+        .join(Paciente, Cita.paciente == Paciente.identificacion)
+        .join(Medico, Cita.medico == Medico.identificacion)
+        .filter(func.date(Cita.fecha_hora) == hoy)
+        .order_by(Cita.fecha_hora.asc())
         .all()
     )
     return citas

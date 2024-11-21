@@ -9,3 +9,6 @@ con el fin de prestar un mejor servicio a la comunidad.
 ### uvicorn main:app --reload
 ### http://localhost:8000/docs
 La interfaz generada automáticamente basada en Swagger UI, uvicorn para probar APIs RESTful localmente.
+
+# Hacer un merge 
+Merge de las ramas

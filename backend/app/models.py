@@ -5,7 +5,7 @@ from .config import Config
 from sqlalchemy.sql import func
 
 # Configuración de SQLAlchemy
-engine = create_engine(Config.DATABASE_URI)
+engine = create_engine(Config.DATABASE_URI, connect_args={"charset": "utf8mb4"})
 Session = sessionmaker(bind=engine)
 session = Session()
 
