@@ -41,7 +41,7 @@ El archivo docker-compose.yml contiene la informacio para construir cada contene
 Pudes clonar el proyecto desde github
 git clone https://github.com/nhzamorano/trabajo_final.git
 
-# INstalacion LOcal
+# Instalacion Local
 Instala las dependencias desde el archivo requirements.txt
 pip install -r requirements.txt
 
