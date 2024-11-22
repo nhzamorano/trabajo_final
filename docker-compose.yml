@@ -20,6 +20,16 @@ services:
       - "8000:8000"
     depends_on:
       - database
+  
+  frontend:
+    build: ./frontend 
+    environment:
+      FLASK_ENV: development
+    ports:
+      -"5000:5000"
+    depends_on:
+      - backend
+
 
 
 volumes:
