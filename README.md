@@ -47,3 +47,20 @@ pip install -r requirements.txt
 
 # Instalacion en docker
 Ejecutas en linux donde previamente hayas instaldo docker: docker compose up --build -d ubicado en la raiz del proyecto donde este el docker-compose.yml
+
+# Licencia
+GNU General Public License (GPL)
+Link: https://www.gnu.org/licenses/gpl-3.0.html
+
+## Contribuir
+¡Las contribuciones, mejoras, correcciones y sugerencias son bienvenidas!
+
+Si deseas ayudar a mejorar este proyecto, sigue estos pasos:
+1. Haz un fork del proyecto.
+2. Crea una nueva rama (`git checkout -b feature/nueva-funcionalidad`).
+3. Realiza tus cambios y haz commits.
+4. Abre un pull request para que podamos revisarlo.
+
+Si tienes ideas, problemas o preguntas, no dudes en abrir un issue. ¡Toda ayuda es apreciada!
+
+
