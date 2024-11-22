@@ -37,6 +37,7 @@ class Cita(Base):
     paciente = Column(Integer,nullable=False)
     medico = Column(Integer, nullable=False)
 
+"""
 class Usuario(Base):
     __tablename__ = 'usuarios'
     id = Column(Integer, primary_key=True,autoincrement=True)
@@ -47,6 +48,6 @@ class Usuario(Base):
     contrasena = Column(String(255),nullable=False)
     email = Column(String(255),nullable=True,unique=True)
     fecha_registro = Column(DateTime, default=func.now())
-
+"""
 # Crear las tablas en la base de datos (si no existen)
 Base.metadata.create_all(engine)

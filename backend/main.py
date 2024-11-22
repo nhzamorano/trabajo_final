@@ -23,7 +23,7 @@ class CitaBase(BaseModel):
     fecha_hora: str
     paciente: int
     medico: int
-
+"""
 class UsuarioBase(BaseModel):
     nombre: str
     telefono: str 
@@ -32,6 +32,7 @@ class UsuarioBase(BaseModel):
     contrasena: str
     email:str
     fecha_registro: datetime = datetime.now()
+"""
 
 @app.get("/favicon.ico")
 async def favicon():
@@ -176,6 +177,7 @@ def actualizar_cita_view(cita_id: int, cita: CitaBase):
 def obtener_citas_view():
     citas = obtener_citas()
     citas_lista = [{
+        "id": cita.id,
         "fecha_hora": cita.fecha_hora,
         "paciente": paciente_nombre,
         "medico": medico_nombre
@@ -188,7 +190,15 @@ def obtener_citas_view():
     else:
         return {"mensaje": "No hay citas disponibles para ese pasciente en la bd"} 
 
-@app.get("/cita/{identificacion}")
+@app.get("/cita/{id}")
+def obtener_cita_view(id: int):
+    cita = obtener_cita_por_id(id)
+    if not cita:
+        #raise HTTPException(status_code=404, detail="Medico no encontrado")
+        return {"mensaje": "Cita no encontrada"}
+    return {"cita": cita}
+
+@app.get("/cita_copia/{identificacion}")
 def obtener_cita_view(identificacion: int):
     cita = obtener_cita_por_id(identificacion)
     if not cita:
@@ -215,7 +225,24 @@ def obtener_citas_hoy_view():
     else:
         return {"mensaje": "No hay citas para hoy"}
 
-
+@app.get("/citas_semana")
+def obtener_citas_semana_view():
+    citas = obtener_citas_semana()
+    citas_lista = [{
+        "fecha_hora": cita.fecha_hora,
+        "paciente": paciente_nombre,
+        "medico": medico_nombre
+    }
+    for cita, paciente_nombre, medico_nombre in citas
+    ]
+    
+    if citas_lista:
+        return JSONResponse(
+            content={"citas": citas_lista}, 
+            headers={"Content-Type": "application/json; charset=utf-8"}
+        )
+    else:
+        return {"mensaje": "No hay citas para esta semana"}
 
 @app.delete("/cita/{cita_id}")
 def eliminar_cita_view(cita_id: int):
@@ -224,6 +251,7 @@ def eliminar_cita_view(cita_id: int):
         raise HTTPException(status_code=404, detail="Cita no encontrado")
     return {"mensaje": "Cita eliminada"}
 
+"""
 #********Usuarios***********
 @app.post("/usuario")
 def agregar_usuario_view(usuario: UsuarioBase):
@@ -296,4 +324,4 @@ def eliminar_usuario_view(usuario_id: int):
     if not usuario_eliminado:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     return {"mensaje": "Usuario eliminado", "usuario": usuario_eliminado.nombre}
-
+"""

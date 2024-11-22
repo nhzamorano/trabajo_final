@@ -26,10 +26,16 @@ services:
     environment:
       FLASK_ENV: development
     ports:
-      -"5000:5000"
+      - "5000:5000"
     depends_on:
       - backend
-
+  
+  proxy:
+    build: ./proxy 
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
 
 
 volumes:

@@ -1,7 +1,8 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import joinedload
 from sqlalchemy import func
-from .models import Medico,Paciente,Cita,Usuario, session
+from .models import Medico,Paciente,Cita,session
 
 #*************MEDICOS**************************
 def agregar_medico(identificacion : int,nombre_completo: str, telefono:str, especialidad: str):
@@ -173,6 +174,7 @@ def obtener_citas():
         session.query(Cita, Paciente.nombre_completo.label("paciente_nombre"), Medico.nombre_completo.label("medico_nombre"))
         .join(Paciente, Cita.paciente == Paciente.identificacion)
         .join(Medico, Cita.medico == Medico.identificacion)
+        .order_by(Cita.fecha_hora.asc())
         .all()
     )
     return citas
@@ -193,7 +195,89 @@ def obtener_citas_hoy():
     )
     return citas
 
-def obtener_cita_por_id(identificacion: int):
+def obtener_citas_semana():
+    hoy = date.today()
+    inicio_semana = hoy - timedelta(days=hoy.weekday())  # Lunes de esta semana
+    fin_semana = inicio_semana + timedelta(days=6)  # Domingo de esta semana
+    
+    citas = (
+        session.query(
+            Cita, 
+            Paciente.nombre_completo.label("paciente_nombre"), 
+            Medico.nombre_completo.label("medico_nombre")
+        )
+        .join(Paciente, Cita.paciente == Paciente.identificacion)
+        .join(Medico, Cita.medico == Medico.identificacion)
+        .filter(func.date(Cita.fecha_hora) >= inicio_semana)
+        .filter(func.date(Cita.fecha_hora) <= fin_semana)
+        .order_by(Cita.fecha_hora.asc())
+        .all()
+    )
+    return citas
+
+def obtener_cita_por_id(id: int):
+    cita = (
+    session.query(Cita, Paciente.nombre_completo.label('paciente_nombre'), Medico.nombre_completo.label('medico_nombre'))
+    .join(Paciente, Cita.paciente == Paciente.identificacion)
+    .join(Medico, Cita.medico == Medico.identificacion)
+    .filter(Cita.id == id)
+    .first()
+)
+
+    if cita:
+        # Desempaquetando los resultados
+        cita_obj, paciente_nombre, medico_nombre = cita
+        return {
+            "id": cita_obj.id,
+            "fecha_hora": cita_obj.fecha_hora,
+            "id_paciente": cita_obj.paciente,
+            "paciente": paciente_nombre,
+            "id_medico": cita_obj.medico,
+            "medico": medico_nombre
+        }
+    else:
+        return {"mensaje": "Cita no encontrada"}
+
+    """"try:
+        cita = session.query(Cita).filter(Cita.id == id).first()
+        if cita:
+            print(f"Cita encontrada: {cita}")
+            return cita
+        else:
+            print(f"No se encontró la cita con ID {id}")
+            return None
+        
+        cita = (
+            session.query(
+                Cita.fecha_hora,
+                Paciente.nombre_completo.label("paciente_nombre"),
+                Medico.nombre_completo.label("medico_nombre")
+            )
+            .join(Paciente, Cita.paciente == Paciente.identificacion)
+            .join(Medico, Cita.medico == Medico.identificacion)
+            .filter(Cita.id == id)
+            .first()  # Obtiene el primer resultado
+        )
+
+        # Si encuentra la cita, organiza los datos
+        if cita:
+            fecha_hora, paciente_nombre, medico_nombre = cita
+            return {
+                "fecha_hora": fecha_hora.isoformat(),  # Asegúrate de devolver la fecha en formato legible
+                "paciente": paciente_nombre,
+                "medico": medico_nombre,
+            }
+        else:
+            # Si no encuentra, devuelve None
+            return None
+
+    except Exception as e:
+        # Manejo de errores
+        print(f"Error al obtener cita por ID {id}: {e}")
+        return None
+"""
+
+def obtener_cita_por_id_copia(identificacion: int):
     cita = (
         session.query(
             Cita.fecha_hora,
@@ -215,7 +299,7 @@ def obtener_cita_por_id(identificacion: int):
         }
     else:
         return {"mensaje": "No se encontró la cita para este paciente."}
-
+"""
 #----------------------------------------------------------------
 def agregar_usuario(nombre: str, telefono: str,cargo:str,usuario:str,contrasena:str,email:str,fecha_registro: datetime):
     nuevo_usuario = Usuario(nombre=nombre, telefono=telefono,cargo=cargo,usuario=usuario,contrasena=contrasena,email=email,fecha_registro=fecha_registro)
@@ -292,3 +376,4 @@ def eliminar_usuario(usuario_id: int):
         print(f"Error al eliminar el usuario: {str(e)}")
         return None
 
+"""
